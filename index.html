@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gazette Réveillère</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Georgia&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#1a5f6b; --teal-dark:#134851; --paper:#ffffff; --cream:#faf8f3;
+    --ink:#2a2a2a; --ink-soft:#5a5a5a; --line:#e0ddd5; --gold:#c9a227;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:Georgia,'Iowan Old Style',serif;
+    background:var(--cream); color:var(--ink); min-height:100vh;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 80px}
+  header.top{text-align:center;padding:20px 0 12px}
+  header.top h1{font-family:'Poppins',sans-serif;font-weight:800;font-size:26px;
+    color:var(--teal-dark);text-transform:uppercase;letter-spacing:.02em}
+  header.top .tag{font-size:13px;color:var(--ink-soft);font-style:italic;margin-top:4px}
+  .tabs{display:flex;gap:8px;justify-content:center;margin:18px 0 6px}
+  .tab{border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+    padding:8px 16px;border-radius:999px;font-family:'Poppins',sans-serif;font-size:13px;
+    font-weight:600;cursor:pointer;transition:.15s}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:20px;margin-top:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .card h2{font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;
+    color:#fff;background:var(--teal);text-transform:uppercase;letter-spacing:.06em;
+    padding:8px 14px;margin:-20px -20px 16px;border-radius:12px 12px 0 0}
+  label{display:block;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;
+    color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 5px}
+  label:first-child{margin-top:0}
+  input,select,textarea{font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);
+    border-radius:8px;background:#fff;color:var(--ink);width:100%}
+  textarea{min-height:140px;resize:vertical;line-height:1.5}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px}
+  .btn{font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;padding:11px 20px;
+    border-radius:8px;border:1px solid var(--teal);background:var(--teal);color:#fff;
+    cursor:pointer;transition:.15s;white-space:nowrap}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--teal)}
+  .btn.danger{background:#b5453f;border-color:#b5453f}
+  .btn.gold{background:var(--gold);border-color:var(--gold);color:#2a2200}
+  .btn.sm{padding:7px 12px;font-size:13px}
+  .btn:disabled{opacity:.5;cursor:wait}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .muted{color:var(--ink-soft);font-size:13px;line-height:1.5}
+  .hide{display:none!important}
+  .photo-drop{border:2px dashed var(--line);border-radius:10px;padding:20px;text-align:center;
+    cursor:pointer;transition:.15s;margin-top:6px}
+  .photo-drop:hover{border-color:var(--teal);background:rgba(26,95,107,.03)}
+  .photo-drop.drag{border-color:var(--teal);background:rgba(26,95,107,.06)}
+  .photo-drop input[type=file]{display:none}
+  .photo-drop p{font-size:13px;color:var(--ink-soft)}
+  .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:10px}
+  .photo-thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:var(--line)}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover}
+  .photo-thumb .rm{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;
+    background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:14px;line-height:1}
+  .photo-thumb.uploading{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-soft)}
+  .success-box{background:#e8f4ea;border:1px solid #a8d5b0;border-radius:10px;padding:16px;
+    text-align:center;margin-top:16px}
+  .success-box h3{color:#2d6a3a;font-family:'Poppins',sans-serif;margin-bottom:6px}
+  .contrib-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
+    padding:10px 0;border-bottom:1px solid var(--line)}
+  .contrib-row .meta{font-size:12px;color:var(--ink-soft)}
+  .contrib-row .titre{font-weight:600;font-size:14px}
+  .pill{display:inline-block;font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;
+    padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em}
+  .pill.wait{background:#fdecc8;color:#8a5a00}
+  .pill.ok{background:#dcf0df;color:#2d6a3a}
+  .errbar{background:#b5453f;color:#fff;border-radius:8px;padding:10px 12px;font-size:13px;
+    margin-bottom:12px;line-height:1.4}
+  .lock{max-width:320px;margin:40px auto;text-align:center}
+
+  /* ===== APERÇU / IMPRESSION DE LA GAZETTE ===== */
+  #printRoot{display:none}
+  .print-page{background:#fff;max-width:800px;margin:0 auto 24px;box-shadow:0 4px 20px rgba(0,0,0,.1);
+    padding:40px 44px;min-height:1000px;position:relative}
+  .print-band{background:var(--teal);color:#fff;font-family:'Poppins',sans-serif;
+    font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    padding:8px 14px;margin-bottom:22px;display:flex;justify-content:space-between}
+  .print-cover h1{font-family:Georgia,serif;font-size:56px;text-align:center;color:var(--teal-dark);
+    line-height:1.05;margin:20px 0 4px}
+  .print-cover .tag{text-align:center;font-style:italic;color:var(--ink-soft);margin-bottom:24px}
+  .print-cover .cover-img{width:100%;height:280px;object-fit:cover;border-radius:4px;margin-bottom:24px}
+  .print-cols{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  .rub-title{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:var(--teal-dark);
+    margin-bottom:4px}
+  .rub-author{font-style:italic;color:var(--ink-soft);font-size:13px;margin-bottom:12px}
+  .rub-text{font-size:14px;line-height:1.65;white-space:pre-wrap}
+  .rub-text p{margin-bottom:10px}
+  .rub-photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+  .rub-photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px}
+  .rub-photos.single{grid-template-columns:1fr}
+  .rub-photos.single img{aspect-ratio:16/10}
+
+  @media print{
+    body{background:#fff}
+    .wrap,.tabs,header.top{display:none!important}
+    #printRoot{display:block}
+    .print-page{box-shadow:none;margin:0;page-break-after:always}
+    .print-page:last-child{page-break-after:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="appWrap">
+  <header class="top">
+    <h1>Gazette Réveillère</h1>
+    <div class="tag">Le bulletin officiel de la famille Réveillère</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" id="tabContrib">✍️ Ma contribution</button>
+    <button class="tab" id="tabAdmin">🔧 Rédaction</button>
+  </div>
+
+  <!-- ============ CONTRIBUTION ============ -->
+  <section id="viewContrib">
+    <div class="card" id="contribCard">
+      <h2>Numéro en cours</h2>
+      <p class="muted" id="numeroInfo">Chargement…</p>
+    </div>
+
+    <div class="card" id="formCard">
+      <h2>Ta page</h2>
+      <label>Ton prénom</label>
+      <input id="cAuteur" placeholder="Ton prénom">
+
+      <label>Titre de ta rubrique (optionnel)</label>
+      <input id="cTitre" placeholder="Ex : Un mois bien rempli !">
+
+      <label>Ton texte</label>
+      <textarea id="cTexte" placeholder="Raconte ton mois, tes nouvelles, tes anecdotes…"></textarea>
+
+      <label>Tes photos</label>
+      <div class="photo-drop" id="photoDrop">
+        <input type="file" id="photoInput" accept="image/*" multiple>
+        <p>📷 Clique ou dépose tes photos ici</p>
+      </div>
+      <div class="photo-grid" id="photoGrid"></div>
+
+      <div class="row" style="margin-top:20px;justify-content:flex-end">
+        <button class="btn" id="submitBtn">Envoyer ma page</button>
+      </div>
+      <div id="submitSuccess" class="success-box hide">
+        <h3>Merci !</h3>
+        <p class="muted">Ta page a bien été envoyée. Elle sera intégrée à la prochaine gazette.</p>
+      </div>
+      <div id="submitErr" class="errbar hide"></div>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section id="viewAdmin" class="hide">
+    <div class="card lock" id="lockCard">
+      <h2>🔒 Rédaction</h2>
+      <p class="muted" style="margin-bottom:12px">Réservé à l'organisateur.</p>
+      <input type="password" id="adminPass" placeholder="Code" style="margin-bottom:10px">
+      <button class="btn" id="loginBtn" style="width:100%">Déverrouiller</button>
+      <p class="muted" id="lockMsg" style="margin-top:8px;color:#b5453f"></p>
+    </div>
+
+    <div id="adminPanel" class="hide">
+      <div class="card">
+        <h2>📰 Numéros</h2>
+        <div class="row" style="margin-bottom:10px">
+          <input id="newNumTitre" placeholder="Titre (ex: Août 2026)" style="flex:2">
+          <button class="btn sm" id="addNumero">Créer</button>
+        </div>
+        <div id="numeroList"></div>
+      </div>
+
+      <div class="card">
+        <h2>📥 Contributions à valider</h2>
+        <p class="muted" style="margin-bottom:10px">Pour le numéro sélectionné ci-dessus.</p>
+        <div id="contribList"></div>
+      </div>
+
+      <div class="card">
+        <h2>🖨️ Aperçu et impression</h2>
+        <p class="muted" style="margin-bottom:12px">Génère la mise en page complète du numéro
+          avec toutes les contributions validées, prête à imprimer en PDF depuis ton navigateur
+          (Ctrl+P → Enregistrer en PDF).</p>
+        <button class="btn gold" id="buildPreview" style="width:100%">📄 Générer l'aperçu du numéro</button>
+      </div>
+
+      <div class="card" style="text-align:center">
+        <button class="btn ghost sm" id="logoutBtn">Verrouiller</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== zone d'aperçu / impression, hors de la mise en page normale ===== -->
+<div id="printRoot"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   CONFIG SUPABASE — reprend le même projet que les Jeux
+   Jeannettiques, avec de nouvelles tables dédiées à la gazette.
+   ============================================================ */
+const SUPABASE_URL  = "https://aaozrdgtmlcmuhhzbohu.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhb3pyZGd0bWxjbXVoaHpib2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MjAwODgsImV4cCI6MjEwMDE5NjA4OH0.s5rd6VEn4v1LSorTbQDJ6m9A6tH0hYiksvWN0-svGjw";
+const STORAGE_BUCKET = "gazette-photos";
+/* ============================================================ */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const $=s=>document.querySelector(s);
+const el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+let isAdmin=false;
+let numeros=[];
+let currentNumeroId=null;
+let selectedFiles=[];
+
+/* ============================================================
+   CHARGEMENT DES NUMÉROS — pour la vue contribution, on affiche
+   toujours le dernier numéro "ouvert"
+   ============================================================ */
+async function loadNumeros(){
+  const {data,error}=await sb.from("gazette_numeros").select("*").order("created_at",{ascending:false});
+  if(error){ console.error(error); return; }
+  numeros=data||[];
+  renderNumeroInfo();
+  if(isAdmin) renderNumeroList();
+}
+function renderNumeroInfo(){
+  const ouvert=numeros.find(n=>n.statut==="ouvert");
+  const box=$("#numeroInfo");
+  if(!ouvert){
+    box.innerHTML="Aucun numéro n'est ouvert aux contributions pour le moment. Reviens un peu plus tard&nbsp;!";
+    $("#formCard").classList.add("hide");
+    currentNumeroId=null;
+    return;
+  }
+  box.innerHTML=`Tu peux contribuer au numéro <b>${esc(ouvert.titre)}</b>${ouvert.periode?` (${esc(ouvert.periode)})`:""}.`;
+  $("#formCard").classList.remove("hide");
+  currentNumeroId=ouvert.id;
+}
+
+/* ============================================================
+   FORMULAIRE DE CONTRIBUTION
+   ============================================================ */
+const dropZone=$("#photoDrop");
+const fileInput=$("#photoInput");
+dropZone.onclick=()=>fileInput.click();
+dropZone.ondragover=e=>{e.preventDefault();dropZone.classList.add("drag");};
+dropZone.ondragleave=()=>dropZone.classList.remove("drag");
+dropZone.ondrop=e=>{
+  e.preventDefault();dropZone.classList.remove("drag");
+  addFiles(e.dataTransfer.files);
+};
+fileInput.onchange=()=>{ addFiles(fileInput.files); fileInput.value=""; };
+
+function addFiles(fileList){
+  Array.from(fileList).forEach(f=>{
+    if(!f.type.startsWith("image/")) return;
+    selectedFiles.push(f);
+  });
+  renderPhotoGrid();
+}
+function renderPhotoGrid(){
+  const grid=$("#photoGrid");
+  grid.innerHTML="";
+  selectedFiles.forEach((f,i)=>{
+    const thumb=el("div","photo-thumb");
+    const img=el("img");
+    img.src=URL.createObjectURL(f);
+    const rm=el("button","rm"); rm.textContent="✕";
+    rm.onclick=()=>{ selectedFiles.splice(i,1); renderPhotoGrid(); };
+    thumb.append(img,rm);
+    grid.appendChild(thumb);
+  });
+}
+
+$("#submitBtn").onclick=async()=>{
+  const auteur=$("#cAuteur").value.trim();
+  const texte=$("#cTexte").value.trim();
+  const titre=$("#cTitre").value.trim();
+  $("#submitErr").classList.add("hide");
+
+  if(!currentNumeroId){ showSubmitErr("Aucun numéro n'est ouvert pour l'instant."); return; }
+  if(!auteur){ showSubmitErr("Indique ton prénom."); return; }
+  if(!texte && selectedFiles.length===0){ showSubmitErr("Ajoute au moins un texte ou une photo."); return; }
+
+  const btn=$("#submitBtn");
+  btn.disabled=true; const old=btn.textContent; btn.textContent="Envoi…";
+
+  try{
+    const {data:contrib,error:e1}=await sb.from("gazette_contributions")
+      .insert({numero_id:currentNumeroId,auteur,titre,texte,rubrique:"famille"})
+      .select().single();
+    if(e1) throw e1;
+
+    for(let i=0;i<selectedFiles.length;i++){
+      const file=selectedFiles[i];
+      const path=`${contrib.id}/${Date.now()}_${i}_${file.name}`;
+      const {error:eUp}=await sb.storage.from(STORAGE_BUCKET).upload(path,file);
+      if(eUp){ console.error("upload photo",eUp); continue; }
+      const {data:pub}=sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      await sb.from("gazette_photos").insert({contribution_id:contrib.id,url:pub.publicUrl,ordre:i});
+    }
+
+    $("#cAuteur").value=""; $("#cTitre").value=""; $("#cTexte").value="";
+    selectedFiles=[]; renderPhotoGrid();
+    $("#submitSuccess").classList.remove("hide");
+    setTimeout(()=>$("#submitSuccess").classList.add("hide"),6000);
+  }catch(err){
+    console.error(err);
+    showSubmitErr("Erreur : "+(err.message||"impossible d'envoyer ta page. Vérifie ta connexion et réessaie."));
+  }finally{
+    btn.disabled=false; btn.textContent=old;
+  }
+};
+function showSubmitErr(msg){
+  const b=$("#submitErr"); b.textContent="⚠️ "+msg; b.classList.remove("hide");
+}
+
+/* ============================================================
+   ADMIN — gestion des numéros
+   ============================================================ */
+function renderNumeroList(){
+  const box=$("#numeroList"); box.innerHTML="";
+  if(!numeros.length){ box.innerHTML='<p class="muted">Aucun numéro pour le moment.</p>'; return; }
+  numeros.forEach(n=>{
+    const row=el("div","contrib-row");
+    const isSel=n.id===currentNumeroId;
+    row.innerHTML=`<div>
+        <div class="titre">${esc(n.titre)} ${isSel?'<span class="pill ok">Sélectionné</span>':''}</div>
+        <div class="meta">${esc(n.periode||"")} · ${n.statut==="ouvert"?"🟢 ouvert aux contributions":"🔒 fermé"}</div>
+      </div>`;
+    const bSel=el("button","btn ghost sm"); bSel.textContent="Voir";
+    bSel.onclick=()=>{ currentNumeroId=n.id; renderNumeroList(); loadContributions(); };
+    const bTog=el("button","btn sm"); bTog.textContent=n.statut==="ouvert"?"Fermer":"Rouvrir";
+    bTog.onclick=()=>toggleNumeroStatut(n);
+    row.append(bSel,bTog);
+    box.appendChild(row);
+  });
+}
+$("#addNumero").onclick=async()=>{
+  const titre=$("#newNumTitre").value.trim();
+  if(!titre) return;
+  await sb.from("gazette_numeros").insert({titre,statut:"ouvert"});
+  $("#newNumTitre").value="";
+  loadNumeros();
+};
+async function toggleNumeroStatut(n){
+  const next = n.statut==="ouvert" ? "ferme" : "ouvert";
+  await sb.from("gazette_numeros").update({statut:next}).eq("id",n.id);
+  loadNumeros();
+}
+
+/* ============================================================
+   ADMIN — contributions à valider
+   ============================================================ */
+let contributions=[];
+async function loadContributions(){
+  if(!currentNumeroId){ $("#contribList").innerHTML='<p class="muted">Sélectionne un numéro ci-dessus.</p>'; return; }
+  const {data,error}=await sb.from("gazette_contributions")
+    .select("*, gazette_photos(*)").eq("numero_id",currentNumeroId).order("created_at");
+  if(error){ console.error(error); return; }
+  contributions=data||[];
+  renderContribList();
+}
+function renderContribList(){
+  const box=$("#contribList"); box.innerHTML="";
+  if(!contributions.length){ box.innerHTML='<p class="muted">Aucune contribution reçue pour ce numéro.</p>'; return; }
+  contributions.forEach(c=>{
+    const row=el("div","contrib-row");
+    row.innerHTML=`<div>
+        <div class="titre">${esc(c.auteur)}${c.titre?" — "+esc(c.titre):""}</div>
+        <div class="meta">${(c.texte||"").slice(0,60)}${(c.texte||"").length>60?"…":""}
+          ${c.gazette_photos&&c.gazette_photos.length?` · 📷 ${c.gazette_photos.length}`:""}</div>
+      </div>
+      <span class="pill ${c.valide?'ok':'wait'}">${c.valide?"Validée":"En attente"}</span>`;
+    const bTog=el("button","btn sm"); bTog.textContent=c.valide?"Retirer":"Valider";
+    bTog.onclick=async()=>{
+      await sb.from("gazette_contributions").update({valide:!c.valide}).eq("id",c.id);
+      loadContributions();
+    };
+    row.appendChild(bTog);
+    box.appendChild(row);
+  });
+}
+
+/* ============================================================
+   GÉNÉRATION DE L'APERÇU / IMPRESSION
+   Construit la mise en page façon Gazette Réveillère avec toutes
+   les contributions validées, à imprimer via Ctrl+P.
+   ============================================================ */
+$("#buildPreview").onclick=async()=>{
+  if(!currentNumeroId){ alert("Sélectionne d'abord un numéro."); return; }
+  const numero=numeros.find(n=>n.id===currentNumeroId);
+  const valid=contributions.filter(c=>c.valide);
+  if(!valid.length){ alert("Aucune contribution validée pour ce numéro."); return; }
+
+  const root=$("#printRoot");
+  root.innerHTML="";
+
+  /* page de couverture */
+  const cover=el("div","print-page print-cover");
+  const firstPhoto = valid.find(c=>c.gazette_photos&&c.gazette_photos.length)?.gazette_photos[0]?.url;
+  cover.innerHTML=`
+    <div class="print-band"><span>${esc(numero.periode||"")}</span><span>${esc(numero.titre)}</span></div>
+    <h1>GAZETTE<br>RÉVEILLÈRE</h1>
+    <div class="tag">Le bulletin officiel de la famille Réveillère</div>
+    ${firstPhoto?`<img class="cover-img" src="${firstPhoto}">`:""}
+  `;
+  root.appendChild(cover);
+
+  /* une page par contribution (ou deux par page si texte court + peu de photos) */
+  valid.forEach(c=>{
+    const page=el("div","print-page");
+    const photos=(c.gazette_photos||[]).sort((a,b)=>a.ordre-b.ordre);
+    const photosClass = photos.length<=1 ? "rub-photos single" : "rub-photos";
+    page.innerHTML=`
+      <div class="print-band"><span>LES AVENTURES DE LA FAMILLE</span><span>${esc(numero.titre)}</span></div>
+      <div class="rub-title">${esc(c.titre||("Chez "+c.auteur))}</div>
+      <div class="rub-author">par ${esc(c.auteur)}</div>
+      ${photos.length?`<div class="${photosClass}">${photos.map(p=>`<img src="${p.url}">`).join("")}</div>`:""}
+      <div class="rub-text">${esc(c.texte||"").split("\n\n").map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+    `;
+    root.appendChild(page);
+  });
+
+  /* mot de la fin */
+  const endPage=el("div","print-page");
+  endPage.innerHTML=`
+    <div class="print-band"><span>LE MOT DE LA FIN</span><span>${esc(numero.titre)}</span></div>
+    <h2 style="text-align:center;color:var(--teal-dark);font-family:Georgia,serif;margin-top:40px">Gros bisous !</h2>
+    <p style="text-align:center;margin-top:16px;color:var(--ink-soft);font-style:italic">
+      On se retrouve pour le prochain numéro de la Gazette Réveillère.
+    </p>
+  `;
+  root.appendChild(endPage);
+
+  /* déclenche l'impression après un court délai (le temps que les images chargent) */
+  setTimeout(()=>{ window.print(); },500);
+};
+
+/* ===== auth ===== */
+async function login(){
+  const code=$("#adminPass").value.trim();
+  const {data}=await sb.from("config").select("valeur").eq("cle","admin_code").single();
+  if(data && data.valeur===code){
+    isAdmin=true;
+    $("#lockCard").classList.add("hide");
+    $("#adminPanel").classList.remove("hide");
+    renderNumeroList();
+    if(currentNumeroId) loadContributions();
+  } else {
+    $("#lockMsg").textContent="Code incorrect.";
+  }
+}
+function logout(){
+  isAdmin=false;
+  $("#adminPanel").classList.add("hide");
+  $("#lockCard").classList.remove("hide");
+  $("#adminPass").value=""; $("#lockMsg").textContent="";
+}
+
+/* ===== tabs ===== */
+$("#tabContrib").onclick=()=>setTab("Contrib");
+$("#tabAdmin").onclick=()=>setTab("Admin");
+function setTab(which){
+  ["Contrib","Admin"].forEach(v=>{
+    $("#tab"+v).classList.toggle("active", v===which);
+    $("#view"+v).classList.toggle("hide", v!==which);
+  });
+}
+
+/* ===== wiring ===== */
+$("#loginBtn").onclick=login;
+$("#adminPass").addEventListener("keydown",e=>{if(e.key==="Enter")login();});
+$("#logoutBtn").onclick=logout;
+
+/* ===== init ===== */
+loadNumeros();
+</script>
+</body>
+</html>
