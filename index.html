@@ -304,11 +304,21 @@ $("#submitBtn").onclick=async()=>{
 
     for(let i=0;i<selectedFiles.length;i++){
       const file=selectedFiles[i];
-      const path=`${contrib.id}/${Date.now()}_${i}_${file.name}`;
+      /* on nettoie le nom du fichier : Supabase Storage refuse les
+         espaces, accents et caractères spéciaux dans le chemin */
+      const cleanName=file.name
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")   // enlève les accents
+        .replace(/[^a-zA-Z0-9._-]/g,"_");                    // remplace le reste par _
+      const path=`${contrib.id}/${Date.now()}_${i}_${cleanName}`;
       const {error:eUp}=await sb.storage.from(STORAGE_BUCKET).upload(path,file);
-      if(eUp){ console.error("upload photo",eUp); continue; }
+      if(eUp){
+        console.error("upload photo",eUp);
+        showSubmitErr("Certaines photos n'ont pas pu être envoyées : "+eUp.message);
+        continue;
+      }
       const {data:pub}=sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-      await sb.from("gazette_photos").insert({contribution_id:contrib.id,url:pub.publicUrl,ordre:i});
+      const {error:eIns}=await sb.from("gazette_photos").insert({contribution_id:contrib.id,url:pub.publicUrl,ordre:i});
+      if(eIns){ console.error("insert photo row",eIns); }
     }
 
     $("#cAuteur").value=""; $("#cTitre").value=""; $("#cTexte").value="";
