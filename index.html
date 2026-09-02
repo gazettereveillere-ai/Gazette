@@ -78,10 +78,13 @@
     margin-bottom:12px;line-height:1.4}
   .lock{max-width:320px;margin:40px auto;text-align:center}
 
-  /* ===== APERÇU / IMPRESSION DE LA GAZETTE ===== */
+  /* ===== APERÇU / IMPRESSION DE LA GAZETTE =====
+     Chaque .print-page force un saut de page à l'impression, sans
+     hauteur minimale imposée : la page prend exactement la place
+     dont son contenu a besoin, qu'il soit court ou long. */
   #printRoot{display:none}
   .print-page{background:#fff;max-width:800px;margin:0 auto 24px;box-shadow:0 4px 20px rgba(0,0,0,.1);
-    padding:40px 44px;min-height:1000px;position:relative}
+    padding:40px 44px;position:relative}
   .print-band{background:var(--teal);color:#fff;font-family:'Poppins',sans-serif;
     font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
     padding:8px 14px;margin-bottom:22px;display:flex;justify-content:space-between}
@@ -89,7 +92,6 @@
     line-height:1.05;margin:20px 0 4px}
   .print-cover .tag{text-align:center;font-style:italic;color:var(--ink-soft);margin-bottom:24px}
   .print-cover .cover-img{width:100%;height:280px;object-fit:cover;border-radius:4px;margin-bottom:24px}
-  .print-cols{display:grid;grid-template-columns:1fr 1fr;gap:28px}
   .rub-title{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:var(--teal-dark);
     margin-bottom:4px}
   .rub-author{font-style:italic;color:var(--ink-soft);font-size:13px;margin-bottom:12px}
@@ -104,8 +106,20 @@
     body{background:#fff}
     .wrap,.tabs,header.top{display:none!important}
     #printRoot{display:block}
-    .print-page{box-shadow:none;margin:0;page-break-after:always}
-    .print-page:last-child{page-break-after:auto}
+    .print-page{
+      box-shadow:none;margin:0;
+      break-after:page;         /* force le saut de page APRÈS chaque contribution */
+      page-break-after:always;  /* équivalent pour les navigateurs plus anciens */
+    }
+    .print-page:last-child{
+      break-after:auto;
+      page-break-after:auto;    /* pas de page blanche superflue après la dernière */
+    }
+    /* évite qu'une photo ou un titre soit coupé au milieu par un saut de page */
+    .rub-photos img, .rub-title, .rub-author{
+      break-inside:avoid;
+      page-break-inside:avoid;
+    }
   }
 </style>
 </head>
@@ -398,7 +412,13 @@ function renderContribList(){
       await sb.from("gazette_contributions").update({valide:!c.valide}).eq("id",c.id);
       loadContributions();
     };
-    row.appendChild(bTog);
+    const bDel=el("button","btn danger sm"); bDel.textContent="Suppr.";
+    bDel.onclick=async()=>{
+      if(!confirm("Supprimer définitivement cette contribution ?"))return;
+      await sb.from("gazette_contributions").delete().eq("id",c.id);
+      loadContributions();
+    };
+    row.append(bTog,bDel);
     box.appendChild(row);
   });
 }
@@ -428,7 +448,9 @@ $("#buildPreview").onclick=async()=>{
   `;
   root.appendChild(cover);
 
-  /* une page par contribution (ou deux par page si texte court + peu de photos) */
+  /* une page par contribution — sans limite de longueur, mais
+     chaque contribution commence bien sur sa propre page grâce
+     au saut de page forcé en CSS (break-after sur .print-page) */
   valid.forEach(c=>{
     const page=el("div","print-page");
     const photos=(c.gazette_photos||[]).sort((a,b)=>a.ordre-b.ordre);
